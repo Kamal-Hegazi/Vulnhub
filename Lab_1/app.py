@@ -2,17 +2,10 @@ import sqlite3
 from flask import Flask, request, render_template, redirect, url_for, send_file, session
 import subprocess
 import platform
-import bcrypt  # Import bcrypt for password hashing
 
 DATABASE = "users.db"
 app = Flask(__name__)
 app.secret_key = "8573336f852b276fbe9e6576d8a74b84"
-
-def hash_password(password):
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-
-def verify_password(password, hashed_password):
-    return bcrypt.checkpw(password.encode(), hashed_password.encode())
 
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
@@ -31,12 +24,12 @@ def init_db():
         cursor.execute("SELECT username FROM users WHERE username = ?", ("heath",))
         if not cursor.fetchone():
             cursor.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", 
-                           ("heath", hash_password("4155556723"), "developer"))
+                           ("heath", "4155556723", "developer"))
         
         cursor.execute("SELECT username FROM users WHERE username = ?", ("admin",))
         if not cursor.fetchone():
             cursor.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", 
-                           ("admin", hash_password("$5fGz8!qL@vXr2P#dT"), "admin"))
+                           ("admin", "$5fGz8!qL@vXr2P#dT", "admin"))
 
         conn.commit()
 
@@ -44,12 +37,10 @@ def init_db():
 def index_page():
     return render_template("index.html")
 
-
 # Robots Page
 @app.route('/robots.txt', methods=['GET', 'POST'])
 def robots_page():
     return send_file(path_or_file="robots.txt")
-
 
 # Login Page
 @app.route("/bG9naW4", methods=["POST", "GET"])
@@ -63,7 +54,7 @@ def login_page():
             cursor.execute("SELECT id, username, password, role FROM users WHERE username = ?", (username,))
             user = cursor.fetchone()
 
-            if user and verify_password(password, user[2]):
+            if user and password == user[2]:
                 session["username"] = user[1]
                 session["role"] = user[3]
 
@@ -91,8 +82,7 @@ def registeration_page():
             if c.fetchone():
                 return "Username already exists!"
             else:
-                hashed_password = hash_password(password)
-                c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
+                c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
                 conn.commit()
                 conn.close()
                 return redirect(url_for('login_page'))
