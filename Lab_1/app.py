@@ -46,7 +46,7 @@ def robots_page():
 @app.route("/bG9naW4", methods=["POST", "GET"])
 def login_page():
     if request.method == "POST":
-        username = request.form["username"].lower()
+        username = request.form["username"]
         password = request.form["password"]
 
         with sqlite3.connect(DATABASE) as conn:
