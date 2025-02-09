@@ -160,9 +160,14 @@ def admin_panel():
 # Secret Page that Contains Admin Password
 @app.route('/c2VjcmV0', methods=['GET'])
 def secret_page():
-    if session.get("role") != "admin":
-        return "<h1>Only Admin Can Access This Resource!<h1>", 403  # Restrict access to admins only
-    return ".e^h,Q+r*,W[,Fgi3b#TU+!"  # base92
+    referer = request.headers.get('Referer', '')
+
+    # Ensure request comes from the profile page
+    if not referer or "/YWRtaW4" not in referer:
+        return '''<h1>Only Admin Can Access This Resource !<h1>''' ,403  # Block direct access
+
+
+    return ".e^h,Q+r*,W[,Fgi3b#TU+!" # base92
 
 if __name__ == "__main__":
     init_db()
