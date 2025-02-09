@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #ffe4e1; text-align: center; }
+        .health { margin: 20px; padding: 10px; background-color: #ffffff; border-radius: 5px; }
+        .command-wrapper { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <p>Welcome, Administrator!</p>
+    <div class="health">
+        <h3>Device Health Check</h3>
+        <form method="POST">
+            <label for="command">Run a diagnostic command:</label><br>
+            <div class="command-wrapper">
+                <select name="base_command" id="base_command" onchange="updateInputVisibility()">
+                    <option value="hostname">hostname</option>
+                    <option value="whoami">whoami</option>
+                    <option value="ping">ping</option>
+                </select>
+                <span id="ping_hint" style="display: none;">-c 4</span>
+                <input type="text" id="user_input" name="user_input" placeholder="[additional input]" style="display: none;"><br><br>
+            </div>
+            <button type="submit">Run</button>
+        </form>
+        <p><strong>Executed Command:</strong> {{ full_command }}</p>
+        <p><strong>Output:</strong></p>
+        <pre>{{ output }}</pre>
+    </div>
+    <script>
+        function updateInputVisibility() {
+            const baseCommand = document.getElementById('base_command').value;
+            const userInput = document.getElementById('user_input');
+            const pingHint = document.getElementById('ping_hint');
+            const isWindows = '{{ platform }}' === 'windows';
+
+            if (baseCommand === 'ping') {
+                userInput.style.display = 'inline';
+                userInput.placeholder = '[host to ping]';
+                pingHint.style.display = isWindows ? 'none' : 'inline';
+            } else {
+                userInput.style.display = 'none';
+                userInput.value = '';
+                pingHint.style.display = 'none';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateInputVisibility);
+    </script>
+</body>
+</html>
