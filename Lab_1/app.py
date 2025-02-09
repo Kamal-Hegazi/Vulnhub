@@ -70,7 +70,7 @@ def login_page():
 @app.route("/cmVnaXN0ZXI", methods=["GET", "POST"])
 def registeration_page():
     if request.method == 'POST':
-        username = request.form.get('username').lower()
+        username = request.form.get('username')
         password = request.form.get('password')
 
         if not username or not password:
@@ -96,9 +96,13 @@ def inbox_page():
         return redirect(url_for("login_page"))  # Redirect if not logged in
 
     name = request.args.get("name", session["username"])
-    return render_template("inbox.html", name=name)
 
-@app.route('/admin', methods=['GET', 'POST'])
+    if name == "heath":
+        return render_template("inbox.html", name=name)
+    else:
+        return render_template("empty_inbox.html")
+
+@app.route('/YWRtaW4', methods=['GET', 'POST'])
 def admin_panel():
     if session.get("role") != "admin":
         return "<h1>Only Admin Can Access This Resource!<h1>"
